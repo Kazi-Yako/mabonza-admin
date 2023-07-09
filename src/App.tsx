@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './index.css';
+import { AddLocations } from './components/mabonza/AddLocations';
+import { ViewLocations } from './components/mabonza/ViewLocations';
+import { useState } from 'react';
+import { ILocation } from './types/mabonzaTypes';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [locationToEdit, setLocationToEdit] = useState<ILocation | null>({
+		id: '',
+		city: '',
+		state: '',
+		country: '',
+		activeFlag: false,
+	});
+
+	const handleEditIcon = (location: ILocation) => {
+		setLocationToEdit(location);
+	};
+
+	const cancelUpdate = () => {
+		setLocationToEdit(null);
+	};
+
+	return (
+		<div className="wrapper">
+			<h1> Using React, Redux Toolkit and Firebase Cloud Firestore</h1>
+			<div className="add-and-view-books">
+				<AddLocations locationToEdit={locationToEdit} />
+				<ViewLocations
+					handleEditIcon={handleEditIcon}
+					locationToEdit={locationToEdit}
+					cancelUpdate={cancelUpdate}
+				/>
+			</div>
+		</div>
+	);
 }
 
 export default App;
