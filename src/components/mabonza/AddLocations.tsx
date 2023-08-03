@@ -3,9 +3,10 @@ import {
 	addLocationToFirestore,
 	updateLocation,
 } from '../../store/MabonzasSlice';
-import { useDispatch } from 'react-redux';
 import { ILocation } from '../../types/mabonzaTypes';
 import { useAppDispatch } from '../../store';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Props {
 	locationToEdit: ILocation | null;
@@ -14,23 +15,26 @@ interface Props {
 export const AddLocations: React.FC<Props> = (location) => {
 	const dispatch = useAppDispatch();
 
+	const options = ['Active', 'Not Active'];
+
 	// add location states
-	const [id, setId] = useState('');
+	//const [id, setId] = useState(null);
 	const [city, setCity] = useState('');
 	const [state, setState] = useState('');
 	const [country, setCountry] = useState('');
-	const [activeFlag, setActiveFlag] = useState(false);
+	const [activeFlag, setActiveFlag] = useState(options[0]);
 
 	// update location states
 	const [editedId, setEditedId] = useState('');
 	const [editedCity, setEditedCity] = useState('');
 	const [editedState, setEditedState] = useState('');
 	const [editedCountry, setEditedCountry] = useState('');
-	const [editedActiveFlag, setEditedActiveFlag] = useState(false);
+	const [editedActiveFlag, setEditedActiveFlag] = useState(options[0]);
 
 	// updating update location states
 	useEffect(() => {
 		if (location !== null && location.locationToEdit !== null) {
+			setEditedId(location.locationToEdit.id ?? '');
 			setEditedCity(location.locationToEdit.city);
 			setEditedState(location.locationToEdit.state);
 			setEditedCountry(location.locationToEdit.country);
@@ -38,25 +42,31 @@ export const AddLocations: React.FC<Props> = (location) => {
 		}
 	}, [location]);
 
-	// add location event
+	// add location
 	const handleAddLocation = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
+
 		let location: ILocation = {
-			id,
+			//id,
 			city,
 			state,
 			country,
 			activeFlag,
 		};
 
+		if (activeFlag === '') {
+			toast('Please select Status');
+			return;
+		}
+
 		// dispatch function
 		dispatch(addLocationToFirestore(location));
 
-		// clearing form
+		// clearing the form fields
 		setCity('');
 		setState('');
 		setCountry('');
-		setActiveFlag(false);
+		setActiveFlag('');
 	};
 
 	//update location
@@ -74,19 +84,17 @@ export const AddLocations: React.FC<Props> = (location) => {
 
 	// change the active flag value in the drop down
 	const onChange = (event: { target: { value: any } }) => {
-		const value = event.target.value;
-		setActiveFlag(value);
+		setActiveFlag(event.target.value);
 	};
 
 	// update the active flag value in the drop down
 	const onChangeUpdate = (event: { target: { value: any } }) => {
-		const value = event.target.value;
-		setActiveFlag(value);
+		setEditedActiveFlag(event.target.value);
 	};
 
 	return (
 		<>
-			{location === null ? (
+			{location && location.locationToEdit === null ? (
 				<form
 					className="form-group custom-form"
 					onSubmit={handleAddLocation}
@@ -119,10 +127,16 @@ export const AddLocations: React.FC<Props> = (location) => {
 					<br />
 
 					<label>Status</label>
-					<select onChange={onChange} className="form-select">
-						<option value="Select Status" disabled />
-						<option value="True">True</option>
-						<option value="False">False</option>
+					<select
+						value={activeFlag}
+						onChange={onChange}
+						className="form-select"
+					>
+						{options.map((value) => (
+							<option value={value} key={value}>
+								{value}
+							</option>
+						))}
 					</select>
 					<br />
 
@@ -163,10 +177,16 @@ export const AddLocations: React.FC<Props> = (location) => {
 					<br />
 
 					<label>Status</label>
-					<select onChange={onChangeUpdate} className="form-select">
-						<option value="Select Status" disabled />
-						<option value="True">True</option>
-						<option value="False">False</option>
+					<select
+						value={editedActiveFlag}
+						onChange={onChangeUpdate}
+						className="form-select"
+					>
+						{options.map((value) => (
+							<option value={value} key={value}>
+								{value}
+							</option>
+						))}
 					</select>
 					<br />
 

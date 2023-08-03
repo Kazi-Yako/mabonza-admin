@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
 	deleteAllLocations,
 	deleteLocation,
@@ -32,8 +31,10 @@ export const ViewLocations: React.FC<Props> = ({
 	}, [dispatch]);
 
 	// delete location
-	const handleDelete = (id: string) => {
-		dispatch(deleteLocation(id));
+	const handleDelete = (id: string | undefined) => {
+		if (id !== null) {
+			dispatch(deleteLocation(id));
+		}
 	};
 
 	// delete all books
@@ -49,18 +50,19 @@ export const ViewLocations: React.FC<Props> = ({
 						<div className="book" key={newLocation.id}>
 							<div className="content">
 								<h6>
-									{newLocation.city} ,{newLocation.state},
-									{newLocation.activeFlag}
+									{newLocation.city} , {newLocation.state}
+									<br />
+									{newLocation.country}
 								</h6>
-								<span>
-									<div id={newLocation.country}></div>
-								</span>
+								<span>{newLocation.activeFlag}</span>
 							</div>
 
 							<div className="actions">
 								<span
 									className="icon red"
-									onClick={() => handleDelete(newLocation.id)}
+									onClick={() => {
+										handleDelete(newLocation.id);
+									}}
 								>
 									<Icon
 										icon={basic_trashcan_remove}

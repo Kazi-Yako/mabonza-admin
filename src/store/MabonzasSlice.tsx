@@ -24,7 +24,10 @@ export const addLocationToFirestore = createAsyncThunk(
 	'locations/addLocationToFirestore',
 	async (location: ILocation) => {
 		const addLocationRef = await addDoc(collection(db, 'locations'), {
-			location,
+			activeFlag: location.activeFlag,
+			city: location.city,
+			country: location.country,
+			state: location.state,
 		});
 		const newLocation = { id: addLocationRef.id, location };
 		return newLocation;
@@ -54,11 +57,6 @@ export const fetchLocations = createAsyncThunk<{ locations: ILocation[] }>(
 			});
 		}
 
-		// const locations = querySnapshot.docs.map((doc) => ({
-		// 	id: doc.id,
-		// 	location: doc.data(),
-		// }));
-
 		return {
 			locations: locationResults,
 		};
@@ -68,7 +66,7 @@ export const fetchLocations = createAsyncThunk<{ locations: ILocation[] }>(
 // delete book
 export const deleteLocation = createAsyncThunk(
 	'locations/deleteLocation',
-	async (id: string) => {
+	async (id: string | undefined) => {
 		const locations = await getDocs(collection(db, 'locations'));
 		for (var snap of locations.docs) {
 			if (snap.id === id) {
@@ -99,7 +97,12 @@ export const updateLocation = createAsyncThunk(
 		for (var snap of locations.docs) {
 			if (snap.id === editedLocation.id) {
 				const locationRef = doc(db, 'locations', snap.id);
-				await updateDoc(locationRef, { editedLocation });
+				await updateDoc(locationRef, {
+					activeFlag: editedLocation.activeFlag,
+					city: editedLocation.city,
+					country: editedLocation.country,
+					state: editedLocation.state,
+				});
 			}
 		}
 		return editedLocation;
@@ -113,7 +116,7 @@ const mabonzasSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchLocations.fulfilled, (state, action) => {
-				state.locations.concat(action.payload.locations);
+				state.locations = action.payload.locations;
 			})
 			.addCase(fetchLocations.rejected, (state) => {
 				state.error = true;
@@ -137,7 +140,7 @@ const mabonzasSlice = createSlice({
 			.addCase(updateLocation.fulfilled, (s, action) => {
 				const { id, city, state, country, activeFlag } = action.payload;
 				const locationIndex = s.locations.findIndex(
-					(location) => location.id === location.id
+					(location) => location.id === id
 				);
 				if (locationIndex !== -1) {
 					s.locations[locationIndex] = {

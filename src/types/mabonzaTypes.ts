@@ -7,7 +7,7 @@ export interface MabonzaState {
 
 export interface IChurch {
 	id?: string;
-	activeFlag: boolean;
+	activeFlag: string;
 	address: string;
 	city: string;
 	country: string;
@@ -20,8 +20,8 @@ export interface IChurch {
 }
 
 export interface ILocation {
-	id: string;
-	activeFlag: boolean;
+	id?: string;
+	activeFlag: string;
 	city: string;
 	country: string;
 	state: string;
